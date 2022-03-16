@@ -116,10 +116,10 @@ func (b *binder[T]) bind(rows *sql.Rows, obj interface{}) error {
 	return nil
 }
 
-func bindToMap(rows *sql.Rows) []map[string]interface{} {
+func bindToMap(rows *sql.Rows) ([]map[string]interface{}, error) {
 	cts, err := rows.ColumnTypes()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	var ms []map[string]interface{}
 	for rows.Next() {
@@ -130,7 +130,7 @@ func bindToMap(rows *sql.Rows) []map[string]interface{} {
 
 		err = rows.Scan(ptrs...)
 		if err != nil {
-			panic(err)
+			return nil, err
 		}
 		m := map[string]interface{}{}
 		for i, ptr := range ptrs {
@@ -139,5 +139,5 @@ func bindToMap(rows *sql.Rows) []map[string]interface{} {
 
 		ms = append(ms, m)
 	}
-	return ms
+	return ms, nil
 }

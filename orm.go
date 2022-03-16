@@ -84,6 +84,19 @@ func Initialize(ormConfig Config, configs ...ConnectionConfig) error {
 			if err != nil {
 				return err
 			}
+
+			tables, err := getListOfTables(dialect.QueryListTables)(db)
+			if err != nil {
+				return err
+			}
+			for _, table := range tables {
+				spec, err := getTableSchema(dialect.QueryTableSchema)(db, table)
+				if err != nil {
+					return err
+				}
+				globalLogger.Infof("%s: %+v", table, spec)
+			}
+			globalLogger.Infof("Database tables are: %v", tables)
 		}
 		conf.DB = db
 		conf.Dialect = dialect
